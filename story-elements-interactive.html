@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spot the Story Elements!</title>
+<style>
+  :root {
+    --navy:#12345a; --blue:#dff5ff; --pink:#ffe4f0; --yellow:#fff6cf;
+    --green:#dcf8e8; --purple:#eee4ff; --ink:#172c46; --muted:#64748b;
+    --line:#bfd2e8; --white:#fff;
+  }
+  * { box-sizing:border-box; }
+  body {
+    margin:0; padding:22px; background:#f3f7fb; color:var(--ink);
+    font-family: "Trebuchet MS", Arial, sans-serif; line-height:1.5;
+  }
+  .app { max-width:1250px; margin:0 auto; }
+  header {
+    background:linear-gradient(120deg,#174778,#28649a); color:white;
+    border-radius:20px; padding:22px 26px; text-align:center; margin-bottom:18px;
+    box-shadow:0 5px 14px #12345a20;
+  }
+  header h1 { margin:0; font-size:clamp(1.8rem,4vw,2.6rem); }
+  header h1 span { color:#ffe68a; }
+  header p { margin:5px 0 0; font-size:1.05rem; }
+  .layout { display:grid; grid-template-columns:minmax(280px, .92fr) minmax(360px,1.15fr); gap:16px; }
+  .panel { border:2px solid var(--line); border-radius:18px; padding:20px; background:white; }
+  .story { background:linear-gradient(145deg,#f0fbff,#dff5ff); border-color:#a9e7ff; }
+  .suspense { background:linear-gradient(145deg,#fff6fc,#ffe7f5); border-color:#f4c3e5; margin-top:16px; }
+  .elements { background:linear-gradient(145deg,#fffef4,#fff8d9); border-color:#ffe69b; }
+  .vocab { background:linear-gradient(145deg,#f1fff7,#ddf9e9); border-color:#a8ebc7; margin-top:16px; }
+  h2 { font-size:1.35rem; line-height:1.25; margin:0 0 10px; color:#12345a; }
+  h2 .num { display:inline-grid; place-items:center; width:38px; height:38px; margin-right:8px; border-radius:50%; color:white; background:#e99527; }
+  .story-text { font-size:1.12rem; line-height:1.85; }
+  .story-text mark { border-radius:6px; padding:1px 3px; color:inherit; }
+  mark.m1 { background:#ffc8dc; } mark.m2 { background:#bceaff; }
+  mark.m3 { background:#dfd0ff; } mark.m4 { background:#d5f4be; } mark.m5 { background:#ffdfb6; }
+  .hint { color:#51657e; font-size:.93rem; margin-top:4px; }
+  .choices { display:flex; flex-wrap:wrap; gap:8px; margin:15px 0; }
+  .chip { border:0; border-radius:12px; padding:9px 13px; font-weight:700; color:#18324e; cursor:pointer; }
+  .chip:hover { filter:brightness(.97); outline:2px solid #7b9fc7; }
+  .character { background:#ffc8dc; } .setting { background:#bceaff; }
+  .plot { background:#dfd0ff; } .conflict { background:#d5f4be; } .theme { background:#ffdfb6; }
+  .match-row { display:grid; grid-template-columns: minmax(0,1fr) minmax(150px,.65fr); gap:10px; align-items:center; margin:10px 0; }
+  .match-text { border-radius:11px; padding:10px; font-size:.96rem; }
+  .match-text.m1 { background:#ffc8dc; } .match-text.m2 { background:#bceaff; }
+  .match-text.m3 { background:#dfd0ff; } .match-text.m4 { background:#d5f4be; } .match-text.m5 { background:#ffdfb6; }
+  select, input[type=text], textarea {
+    width:100%; border:2px solid #b9cde5; border-radius:10px; padding:11px 12px;
+    background:white; color:#18324e; font:inherit;
+  }
+  select:focus, input:focus, textarea:focus { outline:3px solid #b8e3ff; border-color:#438dc5; }
+  textarea { min-height:86px; resize:vertical; }
+  label { display:block; font-weight:700; margin:13px 0 6px; }
+  .feedback { font-size:.9rem; min-height:1.35em; margin-top:4px; }
+  .correct { color:#087443; font-weight:700; } .incorrect { color:#b42318; font-weight:700; }
+  .vocab-grid { display:grid; grid-template-columns:1fr auto 1fr; gap:10px; align-items:center; }
+  .word-card { border:2px solid #a8e7ff; border-radius:12px; padding:12px; text-align:center; background:#effaff; }
+  .word-card strong { display:block; margin-bottom:6px; color:#1a5285; }
+  .word-card .given { font-weight:800; font-size:1.12rem; padding:7px; background:#d8edff; border-radius:8px; }
+  .arrow { font-size:1.8rem; color:#28a76b; }
+  .actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:18px; }
+  button.action { border:0; border-radius:11px; padding:12px 17px; font:inherit; font-weight:800; cursor:pointer; }
+  .primary { background:#174778; color:white; } .secondary { background:#e4edf7; color:#173654; }
+  button.action:hover { filter:brightness(1.06); }
+  #results { display:none; margin-top:15px; padding:14px; border-radius:12px; background:#eef6ff; border:1px solid #bdd7f3; }
+  footer { text-align:center; color:#2767a2; font-weight:800; margin:18px 0 4px; }
+  @media(max-width:850px) { .layout { grid-template-columns:1fr; } }
+  @media(max-width:520px) {
+    body { padding:10px; } .panel { padding:14px; }
+    .match-row { grid-template-columns:1fr; gap:5px; }
+    .vocab-grid { grid-template-columns:1fr; } .arrow { text-align:center; transform:rotate(90deg); }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>📖 Spot the <span>Story Elements!</span> ✏️</h1>
+    <p>Read the paragraph. Complete each activity, then check your answers.</p>
+  </header>
+
+  <div class="layout">
+    <div>
+      <section class="panel story">
+        <h2>🔎 Read the Paragraph</h2>
+        <div class="story-text">
+          <mark class="m1">Rhea found an old, leather-bound diary</mark>
+          <mark class="m2">in the attic</mark>. The cover was dusty, and the lock looked ancient.
+          <mark class="m3">As she opened it, a faded photograph slipped out.</mark>
+          It showed a girl standing by a mysterious door in a forest.
+          <mark class="m4">Just then, she heard a soft noise coming from the stairs.</mark>
+          <mark class="m5">She froze, wondering who—or what—was there.</mark>
+        </div>
+        <p class="hint">Tip: Pay attention to the character, where events happen, what unfolds, the problem, and the bigger message.</p>
+      </section>
+
+      <section class="panel suspense">
+        <h2><span class="num">2</span> Find the Suspense Clue</h2>
+        <label for="clue">Which part of the paragraph creates suspense?</label>
+        <textarea id="clue" placeholder="Type or quote the suspense clue..."></textarea>
+
+        <h2 style="margin-top:17px"><span class="num">3</span> Why Does It Work?</h2>
+        <label for="effect">How does this clue make the reader want to know what happens next?</label>
+        <textarea id="effect" placeholder="Explain what the reader wonders, expects, or feels..."></textarea>
+      </section>
+    </div>
+
+    <div>
+      <section class="panel elements">
+        <h2><span class="num">1</span> Label the 5 Story Elements</h2>
+        <p class="hint">Choose the correct story element for each highlighted part.</p>
+        <div class="choices" aria-label="Story element guide">
+          <button class="chip character" type="button" data-fill="Character">Character</button>
+          <button class="chip setting" type="button" data-fill="Setting">Setting</button>
+          <button class="chip plot" type="button" data-fill="Plot">Plot</button>
+          <button class="chip conflict" type="button" data-fill="Conflict">Conflict</button>
+          <button class="chip theme" type="button" data-fill="Theme">Theme</button>
+        </div>
+        <div class="match-row">
+          <div class="match-text m1">1. Rhea found an old, leather-bound diary.</div>
+          <select id="e1" aria-label="Story element for sentence 1">
+            <option value="">Choose an element…</option><option>Character</option><option>Setting</option><option>Plot</option><option>Conflict</option><option>Theme</option>
+          </select>
+        </div>
+        <div class="match-row">
+          <div class="match-text m2">2. In the attic.</div>
+          <select id="e2" aria-label="Story element for sentence 2">
+            <option value="">Choose an element…</option><option>Character</option><option>Setting</option><option>Plot</option><option>Conflict</option><option>Theme</option>
+          </select>
+        </div>
+        <div class="match-row">
+          <div class="match-text m3">3. A faded photograph slipped out.</div>
+          <select id="e3" aria-label="Story element for sentence 3">
+            <option value="">Choose an element…</option><option>Character</option><option>Setting</option><option>Plot</option><option>Conflict</option><option>Theme</option>
+          </select>
+        </div>
+        <div class="match-row">
+          <div class="match-text m4">4. She heard a soft noise from the stairs.</div>
+          <select id="e4" aria-label="Story element for sentence 4">
+            <option value="">Choose an element…</option><option>Character</option><option>Setting</option><option>Plot</option><option>Conflict</option><option>Theme</option>
+          </select>
+        </div>
+        <div class="match-row">
+          <div class="match-text m5">5. She froze, wondering who—or what—was there.</div>
+          <select id="e5" aria-label="Story element for sentence 5">
+            <option value="">Choose an element…</option><option>Character</option><option>Setting</option><option>Plot</option><option>Conflict</option><option>Theme</option>
+          </select>
+        </div>
+        <p class="hint">Note: Story elements can overlap. In this activity, choose the best fit for each highlighted part.</p>
+      </section>
+
+      <section class="panel vocab">
+        <h2><span class="num" style="background:#229a68">4</span> Choose a More Precise or Vivid Word</h2>
+        <p>Replace one word from the paragraph with a stronger word that creates a clearer picture.</p>
+        <div class="vocab-grid">
+          <div class="word-card">
+            <strong>Word from the paragraph</strong>
+            <select id="originalWord" aria-label="Choose a word to replace">
+              <option value="mysterious">mysterious</option><option value="soft">soft</option>
+              <option value="old">old</option><option value="dusty">dusty</option>
+              <option value="faded">faded</option><option value="froze">froze</option>
+              <option value="ancient">ancient</option>
+            </select>
+          </div>
+          <div class="arrow" aria-hidden="true">➡</div>
+          <div class="word-card">
+            <strong>More precise or vivid word</strong>
+            <input id="betterWord" type="text" placeholder="e.g. eerie">
+          </div>
+        </div>
+        <label for="wordReason">Why is your replacement more effective? (optional)</label>
+        <textarea id="wordReason" placeholder="It helps the reader imagine…"></textarea>
+      </section>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="action primary" id="checkBtn" type="button">✓ Check My Answers</button>
+    <button class="action secondary" id="showBtn" type="button">Show Sample Answers</button>
+    <button class="action secondary" id="resetBtn" type="button">↻ Start Again</button>
+  </div>
+  <div id="results" role="status" aria-live="polite"></div>
+  <footer>⭐ Great readers spot clues, ask questions, and choose vivid words!</footer>
+</div>
+
+<script>
+  // This activity uses a guided best-fit key. Theme is not explicitly stated in this short paragraph,
+  // so the fifth item is treated as the character's immediate uncertainty/conflict.
+  const answerKey = {
+    e1: "Character",
+    e2: "Setting",
+    e3: "Plot",
+    e4: "Conflict",
+    e5: "Conflict"
+  };
+
+  document.querySelectorAll("[data-fill]").forEach(button => {
+    button.addEventListener("click", () => {
+      const value = button.dataset.fill;
+      const emptySelect = [...document.querySelectorAll(".match-row select")].find(s => !s.value);
+      if (emptySelect) emptySelect.value = value;
+      else {
+        const focused = document.activeElement;
+        if (focused && focused.matches(".match-row select")) focused.value = value;
+      }
+    });
+  });
+
+  function checkAnswers() {
+    let correct = 0;
+    const feedback = [];
+    Object.entries(answerKey).forEach(([id, answer]) => {
+      const select = document.getElementById(id);
+      const existing = select.parentElement.querySelector(".feedback");
+      if (existing) existing.remove();
+      const msg = document.createElement("div");
+      msg.className = "feedback";
+      if (select.value === answer) {
+        correct++;
+        msg.innerHTML = '<span class="correct">✓ Correct</span>';
+      } else {
+        msg.innerHTML = '<span class="incorrect">Review this choice.</span>';
+      }
+      select.insertAdjacentElement("afterend", msg);
+    });
+
+    const clue = document.getElementById("clue").value.trim();
+    const effect = document.getElementById("effect").value.trim();
+    const word = document.getElementById("betterWord").value.trim();
+    const total = 5;
+    const results = document.getElementById("results");
+    results.style.display = "block";
+    results.innerHTML = `<strong>Story-element score: ${correct}/${total}</strong>
+      <p>${clue ? "✓ You have recorded a suspense clue." : "Add a suspense clue to complete Activity 2."}
+      ${effect ? "✓ You have explained its effect on the reader." : "Explain why the clue makes the reader curious."}
+      ${word ? "✓ You have suggested a stronger word." : "Add a replacement word for the vocabulary challenge."}</p>
+      <p class="hint">Open “Show Sample Answers” if you would like to compare your thinking. More than one vocabulary answer may be effective.</p>`;
+    results.scrollIntoView({behavior:"smooth", block:"nearest"});
+  }
+
+  document.getElementById("checkBtn").addEventListener("click", checkAnswers);
+
+  document.getElementById("showBtn").addEventListener("click", () => {
+    const results = document.getElementById("results");
+    results.style.display = "block";
+    results.innerHTML = `<strong>Sample answers</strong>
+      <ul>
+        <li><b>Character:</b> Rhea, the person in the story.</li>
+        <li><b>Setting:</b> The attic; the photograph also refers to a door in a forest.</li>
+        <li><b>Plot:</b> Rhea opens the diary and a faded photograph slips out.</li>
+        <li><b>Conflict / source of tension:</b> Rhea hears a noise and does not know who—or what—is there.</li>
+        <li><b>Theme:</b> Not clearly established yet; more of the story is needed to infer a message.</li>
+        <li><b>Suspense clue:</b> “She heard a soft noise coming from the stairs” or “She froze, wondering who—or what—was there.”</li>
+        <li><b>Effect:</b> The reader wonders who is on the stairs and whether Rhea is in danger, so they want to keep reading.</li>
+        <li><b>Vivid word:</b> “mysterious” → “eerie” or “sinister” (answers may vary).</li>
+      </ul>
+      <p class="hint">Teaching note: A short paragraph may not contain a clear theme. You can change item 5 to “What is Rhea wondering about?” or add a final sentence that hints at a theme.</p>`;
+    results.scrollIntoView({behavior:"smooth", block:"nearest"});
+  });
+
+  document.getElementById("resetBtn").addEventListener("click", () => {
+    document.querySelectorAll("select").forEach(s => s.selectedIndex = 0);
+    document.querySelectorAll("textarea, input[type=text]").forEach(el => el.value = "");
+    document.querySelectorAll(".feedback").forEach(el => el.remove());
+    const results = document.getElementById("results");
+    results.style.display = "none";
+    results.innerHTML = "";
+  });
+</script>
+</body>
+</html>
